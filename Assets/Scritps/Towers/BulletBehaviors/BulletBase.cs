@@ -31,11 +31,25 @@ public abstract class BulletBase : MonoBehaviour
 
     protected virtual void HitTarget()
     {
+        if (target == null)
+        {
+            Debug.LogWarning("Target is null when trying to hit");
+            Destroy(gameObject);
+            return;
+        }
+
         OnHit?.Invoke(target);
         Destroy(gameObject);
     }
 
-    protected virtual void Hit(Transform target) {
+    protected virtual void Hit(Transform target) 
+    {
+        if (target == null)
+        {
+            Debug.LogWarning("Target is null when trying to hit");
+            return;
+        }
+        
         OnHit?.Invoke(target);
     }
 } 

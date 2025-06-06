@@ -15,7 +15,7 @@ MonoBehaviour:
   emName: Kingkong
   image: {fileID: 0}
   description: strong but slow
-  maxHp: 300
+  maxHp: 200
   hpRegen: 0
   armor: 0
   magicResist: 0
@@ -30,7 +30,7 @@ MonoBehaviour:
   criticalDamage: 150
   lifestealPercent: 0
   attackSpeed: 0.1
-  moveSpeed: 5
+  moveSpeed: 2
   range: 0
   detectRange: 0
   healingReceivedPercent: 100

@@ -269,7 +269,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   towerData: {fileID: 11400000, guid: 42fcf7103692c92438350a834a2f8254, type: 2}
-  traits: []
+  traits:
+  - {fileID: 11400000, guid: 206e625ddedf51e4dae9408632b7d427, type: 2}
   skill: {fileID: 0}
   bulletPrefab: {fileID: 5328923442398399026, guid: 6012fdd85b31d304bb8b48bf16362cb3, type: 3}
   firePoint: {fileID: 2148796197697518859}

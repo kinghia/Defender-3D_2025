@@ -2,15 +2,32 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private EnemyStats stats;
+    private EnemyHpBar hpBar;
+
+    void OnEnable()
     {
-        
+        Init();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Init()
     {
+        hpBar = GetComponentInChildren<EnemyHpBar>();
+        stats = GetComponent<EnemyStats>();
         
+        if (stats == null)
+        {
+            Debug.LogError($"EnemyStats component not found on {gameObject.name}");
+            return;
+        }
+        
+        if (hpBar == null)
+        {
+            Debug.LogError($"EnemyHpBar component not found on {gameObject.name}");
+            return;
+        }
+
+        stats.Initialize();
+        hpBar.Init(stats);
     }
 }

@@ -15,10 +15,10 @@ MonoBehaviour:
   towerName: 
   image: {fileID: 0}
   description: 
-  physicalDamage: 5
+  physicalDamage: 10
   magicDamage: 0
   criticalChance: 10
   criticalDamage: 150
   attackSpeed: 1
-  range: 35
+  range: 30
   maxMana: 0

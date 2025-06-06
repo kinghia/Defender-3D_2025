@@ -64,18 +64,36 @@ public class ArrowTower : TowerBase
     protected override void HandleBulletHit(Transform hitTarget)
     {
         if (hitTarget == null) return;
+
+        EnemyStats emStats = hitTarget.GetComponent<EnemyStats>();
+        if (emStats == null)
+        {
+            Debug.LogWarning($"EnemyStats component not found on {hitTarget.name}");
+            return;
+        }
+
+        if (stats == null)
+        {
+            Debug.LogError($"Tower stats is null on {gameObject.name}");
+            return;
+        }
+
         base.HandleBulletHit(hitTarget);
         ShowHitEffect(hitTarget);
-        EnemyStats emStats = hitTarget.GetComponent<EnemyStats>();
-        if (emStats != null)
-        {
-            emStats.TakeDamage(stats.GetPhysicalDamage(), DamageType.Physical);
-        }
+        emStats.TakeDamage(stats.GetPhysicalDamage(), DamageType.Physical);
     }
 
     private void ShowHitEffect(Transform hitTarget)
     {
+        if (hitEffect == null)
+        {
+            Debug.LogWarning($"Hit effect prefab is not assigned on {gameObject.name}");
+            return;
+        }
+
         var aoe = Instantiate(hitEffect, hitTarget.position + Vector3.up, Quaternion.identity);
+        if (aoe == null) return;
+
         ParticleSystem ps = aoe.GetComponent<ParticleSystem>();
         if (ps != null)
         {

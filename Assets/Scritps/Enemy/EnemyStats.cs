@@ -18,28 +18,57 @@ public class EnemyStats : BaseStats
 
         if (data == null)
         {
-            Debug.LogError("Enemy Stats missing data");
+            Debug.LogError($"Enemy Stats missing data on {gameObject.name}");
+            return;
         }
 
         currentHp = data.maxHp;
         currentShield = 0;
         ResetModifiers();
+        
+        // Notify initial HP
+        InvokeHpChanged(currentHp, GetMaxHp());
     }
 
     public void TakeDamage(float amount, DamageType damageType)
     {
+        if (data == null)
+        {
+            Debug.LogError($"Enemy Stats missing data on {gameObject.name}");
+            return;
+        }
+
+        if (IsDead) return;
+
         float finalDamage = CalculateFinalDamage(amount, damageType);
-
         float remainingDamage = ProcessShieldDamage(finalDamage);
-
         float healthDamage = ProcessHealthDamage(remainingDamage, damageType);
 
         // Notify HP change
         InvokeHpChanged(currentHp, GetMaxHp());
+
+        // Check for death
+        if (IsDead)
+        {
+            HandleDeath();
+        }
+    }
+
+    private void HandleDeath()
+    {
+        onDeath?.Invoke();
+        Destroy(gameObject);
     }
 
     private float ProcessHealthDamage(float damage, DamageType damageType)
     {
+        if (FloatingTextSpawner.Instance == null)
+        {
+            Debug.LogWarning("FloatingTextSpawner.Instance is null");
+            currentHp = Mathf.Max(0, currentHp - damage);
+            return damage;
+        }
+
         currentHp = Mathf.Max(0, currentHp - damage);
 
         FloatingTextType fType = FloatingTextType.Default;
@@ -54,7 +83,6 @@ public class EnemyStats : BaseStats
             case DamageType.True:
                 fType = FloatingTextType.Default;
                 break;
-
         }
 
         FloatingTextSpawner.Instance.SpawnText(

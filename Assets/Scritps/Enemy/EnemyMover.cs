@@ -3,9 +3,19 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] float speed = 5f;
     [SerializeField] float destroyX = -20f;
     bool movement = true;
+
+    EnemyStats enemyStats;
+
+    void Awake()
+    {
+        enemyStats = GetComponent<EnemyStats>();
+        if (enemyStats == null)
+        {
+            Debug.LogError("EnemyStats component not found on " + gameObject.name);
+        }
+    }
 
     void OnEnable()
     {
@@ -16,10 +26,12 @@ public class EnemyMover : MonoBehaviour
 
     void Update()
     {
+        if (enemyStats == null) return;
+
         // Move left
         if (movement)
         {
-            transform.Translate(Vector3.left * speed * Time.deltaTime);
+            transform.Translate(Vector3.left * enemyStats.GetMoveSpeed() * Time.deltaTime);
         }
 
         // Check if out of bounds
