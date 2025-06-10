@@ -19,6 +19,6 @@ MonoBehaviour:
   magicDamage: 0
   criticalChance: 10
   criticalDamage: 150
-  attackSpeed: 1
+  attackSpeed: 2.5
   range: 30
   maxMana: 0
