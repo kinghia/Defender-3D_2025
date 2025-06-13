@@ -5,23 +5,16 @@ public class Enemy : MonoBehaviour
 {
     private EnemyStats stats;
     private EnemyHpBar hpBar;
-
-    private Vector3 targetPosition;
+    private EnemyMover mover;
     private bool isAttacking = false;
     private float attackCooldown = 0f;
     private Transform castleTransform;
-    [SerializeField] Transform enemyTransform;
 
     public event Action<Enemy> OnEnemyDeath;
     public event Action<Enemy> OnEnemyReachedCastle;
 
     void OnEnable()
     {
-        if (enemyTransform == null)
-        {
-            enemyTransform = transform; // Gán giá trị mặc định
-        }
-
         Init();
     }
 
@@ -29,6 +22,7 @@ public class Enemy : MonoBehaviour
     {
         hpBar = GetComponentInChildren<EnemyHpBar>();
         stats = GetComponent<EnemyStats>();
+        mover = GetComponent<EnemyMover>();
         
         if (stats == null)
         {
@@ -39,6 +33,12 @@ public class Enemy : MonoBehaviour
         if (hpBar == null)
         {
             Debug.LogError($"EnemyHpBar component not found on {gameObject.name}");
+            return;
+        }
+
+        if (mover == null)
+        {
+            Debug.LogError($"EnemyMover component not found on {gameObject.name}");
             return;
         }
 
@@ -55,39 +55,21 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void SetTarget(Vector3 targetPos, Transform castle)
+    public void Initialize(Transform castle)
     {
-        targetPosition = targetPos;
         castleTransform = castle;
-        isAttacking = false;
+        if (mover != null && stats != null)
+        {
+            mover.Initialize(castle, stats.GetRange());
+        }
     }
 
     void Update()
     {
-        enemyTransform.LookAt(castleTransform);
-
         if (stats == null || stats.IsDead) return;
 
-        if (!isAttacking)
-        {
-            // Move towards target
-            float distanceToCastle = Vector3.Distance(transform.position, castleTransform.position);
-            if (distanceToCastle <= stats.GetRange())
-            {
-                isAttacking = true;
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(
-                    transform.position,
-                    targetPosition,
-                    stats.GetMoveSpeed() * Time.deltaTime
-                );
-            }
-        }
-        else
-        {
-            // Handle attack
+        if (isAttacking)
+        {   
             attackCooldown -= Time.deltaTime;
             if (attackCooldown <= 0f)
             {
@@ -97,10 +79,16 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void StartAttacking()
+    {
+        isAttacking = true;
+        OnEnemyReachedCastle?.Invoke(this);
+    }
+
     private void AttackCastle()
     {
         // Trigger attack animation/effect here
-        // For now, just notify that enemy reached castle
+        // For now, just notify that enemy is attacking castle
         OnEnemyReachedCastle?.Invoke(this);
     }
 

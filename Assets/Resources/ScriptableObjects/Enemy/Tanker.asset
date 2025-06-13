@@ -30,7 +30,7 @@ MonoBehaviour:
   criticalDamage: 150
   lifestealPercent: 0
   attackSpeed: 0.1
-  moveSpeed: 2
+  moveSpeed: 4
   range: 0
   detectRange: 0
   healingReceivedPercent: 100

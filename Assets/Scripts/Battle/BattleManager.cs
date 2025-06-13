@@ -10,7 +10,8 @@ public class BattleManager : MonoBehaviour
     [Header("Level Configuration")]
     [SerializeField] private LevelData levelData;
     [SerializeField] private Transform castleTransform;
-    [SerializeField] private float spawnX = 20f; // X position for spawning enemies
+    [SerializeField] private float spawnX = 20f;
+    [SerializeField] private float zRandomRange = 0.5f; // Random range for Z position
 
     [Header("Battle State")]
     [SerializeField] private int castleHealth = 100;
@@ -18,11 +19,9 @@ public class BattleManager : MonoBehaviour
 
     private List<Enemy> activeEnemies = new List<Enemy>();
     private bool isBattleActive = false;
-    private int currentLaneIndex = 0;
-    private int currentWaveIndex = 0;
     private int totalEnemiesSpawned = 0;
     private int totalEnemiesInLevel = 0;
-    private bool isSpawningWave = false;
+    private List<Coroutine> activeWaveCoroutines = new List<Coroutine>();
 
     public event Action<int, int> OnCastleHealthChanged;
     public event Action OnBattleVictory;
@@ -46,7 +45,6 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        // Calculate total enemies in level
         CalculateTotalEnemies();
         currentCastleHealth = castleHealth;
         StartBattle();
@@ -74,56 +72,30 @@ public class BattleManager : MonoBehaviour
         }
 
         isBattleActive = true;
-        currentLaneIndex = 0;
-        currentWaveIndex = 0;
         totalEnemiesSpawned = 0;
-        StartCoroutine(ProcessLanes());
+        StartAllWaves();
     }
 
-    private IEnumerator ProcessLanes()
+    private void StartAllWaves()
     {
-        Debug.Log($"Starting battle with {levelData.lanes.Count} lanes");
-        
-        while (currentLaneIndex < levelData.lanes.Count && isBattleActive)
+        foreach (var lane in levelData.lanes)
         {
-            LaneWaveData currentLane = levelData.lanes[currentLaneIndex];
-            currentWaveIndex = 0;
-
-            Debug.Log($"Processing lane {currentLaneIndex + 1} at Z position {currentLane.laneZ}");
-
-            while (currentWaveIndex < currentLane.waves.Count && isBattleActive)
+            foreach (var wave in lane.waves)
             {
-                WaveData wave = currentLane.waves[currentWaveIndex];
-                Debug.Log($"Starting wave {currentWaveIndex + 1} in lane {currentLaneIndex + 1} with {wave.enemyCount} enemies");
-                
-                yield return new WaitForSeconds(wave.startDelay);
-
-                isSpawningWave = true;
-                yield return StartCoroutine(SpawnWave(wave, currentLane.laneZ));
-                isSpawningWave = false;
-
-                // Wait for a short time after wave is spawned
-                yield return new WaitForSeconds(1f);
-                
-                currentWaveIndex++;
-                Debug.Log($"Completed wave {currentWaveIndex} in lane {currentLaneIndex + 1}");
+                // Start each wave with its own delay
+                Coroutine waveCoroutine = StartCoroutine(SpawnWaveWithDelay(wave, lane.laneZ, wave.startDelay));
+                activeWaveCoroutines.Add(waveCoroutine);
             }
-
-            currentLaneIndex++;
-            Debug.Log($"Completed lane {currentLaneIndex}");
-        }
-
-        Debug.Log($"All lanes completed. Total enemies spawned: {totalEnemiesSpawned}/{totalEnemiesInLevel}");
-
-        // Check if all enemies are defeated
-        if (isBattleActive && activeEnemies.Count == 0)
-        {
-            Debug.Log("All waves completed and enemies defeated!");
-            OnBattleVictory?.Invoke();
         }
     }
 
-    private IEnumerator SpawnWave(WaveData wave, float laneZ)
+    private IEnumerator SpawnWaveWithDelay(WaveData wave, float baseLaneZ, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        yield return StartCoroutine(SpawnWave(wave, baseLaneZ));
+    }
+
+    private IEnumerator SpawnWave(WaveData wave, float baseLaneZ)
     {
         Debug.Log($"Spawning wave with {wave.enemyCount} enemies of type {wave.enemyType.name}");
         
@@ -137,10 +109,13 @@ public class BattleManager : MonoBehaviour
                 Enemy enemy = enemyObj.GetComponent<Enemy>();
                 if (enemy != null)
                 {
-                    // Set position and target
-                    Vector3 spawnPos = new Vector3(spawnX, 0f, laneZ);
+                    // Randomize Z position within range
+                    float randomZ = baseLaneZ + UnityEngine.Random.Range(-zRandomRange, zRandomRange);
+                    Vector3 spawnPos = new Vector3(spawnX, 0f, randomZ);
                     enemyObj.transform.position = spawnPos;
-                    enemy.SetTarget(castleTransform.position, castleTransform);
+
+                    // Initialize enemy
+                    enemy.Initialize(castleTransform);
 
                     // Subscribe to events
                     enemy.OnEnemyDeath += HandleEnemyDeath;
@@ -149,16 +124,8 @@ public class BattleManager : MonoBehaviour
                     activeEnemies.Add(enemy);
                     totalEnemiesSpawned++;
                     
-                    Debug.Log($"Spawned enemy {totalEnemiesSpawned}/{totalEnemiesInLevel} (Wave {currentWaveIndex + 1}, Lane {currentLaneIndex + 1})");
+                    Debug.Log($"Spawned enemy {totalEnemiesSpawned}/{totalEnemiesInLevel}");
                 }
-                else
-                {
-                    Debug.LogError($"Enemy component not found on spawned object");
-                }
-            }
-            else
-            {
-                Debug.LogError($"Failed to get enemy from pool for type {wave.enemyType.name}");
             }
 
             yield return new WaitForSeconds(wave.delayBetweenEnemies);
@@ -175,9 +142,8 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log($"Enemy died. Active enemies: {activeEnemies.Count}, Total spawned: {totalEnemiesSpawned}/{totalEnemiesInLevel}");
 
-        // Only check for victory if we're not currently spawning a wave
-        if (!isSpawningWave && isBattleActive && activeEnemies.Count == 0 && 
-            currentLaneIndex >= levelData.lanes.Count)
+        // Check for victory condition
+        if (isBattleActive && activeEnemies.Count == 0 && totalEnemiesSpawned >= totalEnemiesInLevel)
         {
             Debug.Log("Victory condition met!");
             OnBattleVictory?.Invoke();
@@ -219,7 +185,7 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("Resuming battle");
             isBattleActive = true;
-            StartCoroutine(ProcessLanes());
+            StartAllWaves();
         }
     }
 } 

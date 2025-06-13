@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54b8a28ebaac22949bb2078ee1d41372, type: 3}
+  m_Name: Stage2
+  m_EditorClassIdentifier: 
+  lanes:
+  - laneZ: 0
+    waves:
+    - startDelay: 0
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 5
+      delayBetweenEnemies: 2
+    - startDelay: 5
+      enemyType: {fileID: 11400000, guid: ddbc526d12a4adf429505483edb9471d, type: 2}
+      enemyCount: 5
+      delayBetweenEnemies: 2
+    - startDelay: 1
+      enemyType: {fileID: 11400000, guid: 63463de97615d6e44b0f8155344b96dc, type: 2}
+      enemyCount: 16
+      delayBetweenEnemies: 1
+  - laneZ: -5
+    waves:
+    - startDelay: 4
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 20
+      delayBetweenEnemies: 1
+    - startDelay: 2
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 15
+      delayBetweenEnemies: 0.3
+    - startDelay: 3
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 5
+      delayBetweenEnemies: 2.5
+  - laneZ: 10
+    waves:
+    - startDelay: 4
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 20
+      delayBetweenEnemies: 0.5
+    - startDelay: 2
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 15
+      delayBetweenEnemies: 0.3
+    - startDelay: 3
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 5
+      delayBetweenEnemies: 2.5
+  - laneZ: -10
+    waves:
+    - startDelay: 4
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 20
+      delayBetweenEnemies: 0.5
+    - startDelay: 2
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 15
+      delayBetweenEnemies: 0.3
+    - startDelay: 3
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 5
+      delayBetweenEnemies: 2.5

@@ -3,10 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] float destroyX = -10f;
-    bool movement = true;
-
-    EnemyStats enemyStats;
+    private EnemyStats enemyStats;
+    private bool isMoving = true;
+    private Transform castleTransform;
+    private float attackRange;
 
     void Awake()
     {
@@ -19,30 +19,42 @@ public class EnemyMover : MonoBehaviour
 
     void OnEnable()
     {
-        // Reset position when enabled
-        float randomZ = Random.Range(-10f, 10f);
-        transform.position = new Vector3(20f, 0f, randomZ);
+        isMoving = true;
+    }
+
+    public void Initialize(Transform castle, float range)
+    {
+        castleTransform = castle;
+        attackRange = range;
     }
 
     void Update()
     {
-        Movement();
-    }
+        if (enemyStats == null || castleTransform == null) return;
 
-    void Movement()
-    {
-        if (enemyStats == null) return;
-
-        // Move left
-        if (movement)
+        if (isMoving)
         {
+            // Check if in attack range
+            float distanceToCastle = Mathf.Abs(transform.position.x - castleTransform.position.x);
+            if (distanceToCastle <= attackRange)
+            {
+                isMoving = false;
+                GetComponent<Enemy>()?.StartAttacking();
+                return;
+            }
+
+            // Move left on X axis only
             transform.Translate(Vector3.left * enemyStats.GetMoveSpeed() * Time.deltaTime);
         }
+    }
 
-        // Check if out of bounds
-        if (transform.position.x <= destroyX)
-        {
-            movement = false;
-        }
+    public void StopMoving()
+    {
+        isMoving = false;
+    }
+
+    public void ResumeMoving()
+    {
+        isMoving = true;
     }
 }

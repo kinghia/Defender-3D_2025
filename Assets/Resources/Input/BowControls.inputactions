@@ -1,0 +1,54 @@
+{
+    "name": "BowControls",
+    "maps": [
+        {
+            "name": "Bow",
+            "id": "d5ed9494-453b-4c45-96be-e7727337d609",
+            "actions": [
+                {
+                    "name": "Aim",
+                    "type": "Button",
+                    "id": "ee61e378-f3da-4c59-808d-a70ee0a30172",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "c7e2de11-2879-41d3-9b19-96e49e8f3b39",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "bfe76479-dbe0-46ac-b254-4de6cd5758fd",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "58378f8a-ad05-4adf-a58f-4a88fc45ae2f",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
