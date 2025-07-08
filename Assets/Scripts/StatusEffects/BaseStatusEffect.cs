@@ -10,14 +10,14 @@ public enum EffectStackingRule
 
 public abstract class BaseStatusEffect
 {
-    protected GameObject holder;
+    public GameObject holder;
     protected float duration;
     protected float timer;
     public EffectStackingRule StackingRule { get; protected set; }
+    protected bool isRemoved = false;
 
-    public BaseStatusEffect(GameObject holder, float duration)
+    public BaseStatusEffect(float duration)
     {
-        this.holder = holder;
         this.duration = duration;
         this.timer = 0f;
         // Default stacking rule, concrete classes should set their own
@@ -29,9 +29,17 @@ public abstract class BaseStatusEffect
         timer += deltaTime;
     }
 
-    public abstract void Apply();
+    public virtual void Apply(GameObject holder)
+    {
+        if (holder == null) return;
+        isRemoved = false;
+        this.holder = holder;
+    }
 
-    public abstract void Remove();
+    public virtual void Remove()
+    {
+        isRemoved = true;
+    }
 
     public bool IsExpired()
     {
@@ -39,9 +47,5 @@ public abstract class BaseStatusEffect
     }
 
     // Virtual method to handle merging effects, override in concrete classes for Extend rule
-    public virtual bool MergeWith(BaseStatusEffect newEffect)
-    {
-        // By default, effects cannot be merged. Concrete classes must override.
-        return false;
-    }
-} 
+    public virtual void MergeWith(BaseStatusEffect newEffect) { }
+}

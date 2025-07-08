@@ -1,7 +1,5 @@
 using UnityEngine;
 
-public enum FloatingTextType { Default, Physic, Magic, Gold, Crit }
-
 public class FloatingTextSpawner : MonoBehaviour
 {
     public static FloatingTextSpawner Instance { get; private set; }
@@ -9,19 +7,8 @@ public class FloatingTextSpawner : MonoBehaviour
     [Header("References")]
     public FloatingTextPool pool;
 
-    [Header("Font Sizes")]
-    public float defaultFontSize = 36f;
-    public float physicFontSize = 40f;
-    public float magicFontSize = 40f;
-    public float goldFontSize = 32f;
-    public float critFontSize = 48f;
-
-    [Header("Colors")]
-    public Color defaultColor = Color.white;
-    public Color physicColor = Color.red;
-    public Color magicColor = Color.cyan;
-    public Color goldColor = Color.yellow;
-    public Color critColor = new Color(1f, 0.5f, 0f);
+    [Header("Critical Hit Symbol")]
+    [SerializeField] private string criticalHitSymbol = "💥";
 
     void Awake()
     {
@@ -33,40 +20,38 @@ public class FloatingTextSpawner : MonoBehaviour
         Instance = this;
     }
 
-    public void SpawnText(string content, Vector3 worldPosition, FloatingTextType type = FloatingTextType.Default)
+    public void SpawnText(string content, Vector3 worldPosition, Color color, int fontsize = 12, float duration = 1.5f)
     {
         var floatingText = pool.Get();
-        Color useColor = GetColorByType(type);
-        float useFontSize = GetFontSizeByType(type);
-        floatingText.Init(content, worldPosition, useColor, useFontSize, OnTextDespawned);
+        Vector3 position = worldPosition;
+
+        floatingText.Init(content, worldPosition, color, fontsize, OnTextDespawned, duration);
+    }
+
+    public void SpawnDamage(string content, Vector3 worldPosition, Color color, int fontsize = 12, bool isCrit = false)
+    {
+        var floatingText = pool.Get();
+
+        // Generate random offset around the position using configurable ranges
+        Vector3 randomOffset = new Vector3(
+            Random.Range(-1, 1), // Random X offset
+            Random.Range(0.5f, 1.5f), // Random Y offset (always positive to float up)
+            0
+        );
+
+        Vector3 position = worldPosition + randomOffset;
+
+        if (isCrit)
+        {
+            content = criticalHitSymbol + " " + content;
+            fontsize = (int)(fontsize * 1.5f);
+        }
+
+        floatingText.Init(content, position, color, fontsize, OnTextDespawned);
     }
 
     private void OnTextDespawned(FloatingText text)
     {
         pool.ReturnToPool(text);
-    }
-
-    private Color GetColorByType(FloatingTextType type)
-    {
-        switch (type)
-        {
-            case FloatingTextType.Physic: return physicColor;
-            case FloatingTextType.Magic: return magicColor;
-            case FloatingTextType.Gold: return goldColor;
-            case FloatingTextType.Crit: return critColor;
-            default: return defaultColor;
-        }
-    }
-
-    private float GetFontSizeByType(FloatingTextType type)
-    {
-        switch (type)
-        {
-            case FloatingTextType.Physic: return physicFontSize;
-            case FloatingTextType.Magic: return magicFontSize;
-            case FloatingTextType.Gold: return goldFontSize;
-            case FloatingTextType.Crit: return critFontSize;
-            default: return defaultFontSize;
-        }
     }
 }

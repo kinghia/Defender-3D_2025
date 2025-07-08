@@ -4,14 +4,15 @@ public class SlowEffect : BaseStatusEffect
 {
     private float slowPercent;
 
-    public SlowEffect(GameObject holder, float duration, float slowPercent) : base(holder, duration)
+    public SlowEffect(float duration, float slowPercent) : base(duration)
     {
         this.slowPercent = slowPercent;
-        this.StackingRule = EffectStackingRule.Replace; // Replace existing slow effect
+        this.StackingRule = EffectStackingRule.Extend; // Replace existing slow effect
     }
 
-    public override void Apply()
+    public override void Apply(GameObject holder)
     {
+        base.Apply(holder);
         if (holder.TryGetComponent<EnemyStats>(out EnemyStats enemyStats))
         {
             // Apply slow by reducing moveSpeed
@@ -21,6 +22,8 @@ public class SlowEffect : BaseStatusEffect
 
     public override void Remove()
     {
+        if (isRemoved) return;
+        base.Remove();
         if (holder.TryGetComponent<EnemyStats>(out EnemyStats enemyStats))
         {
             // Remove slow effect
@@ -28,7 +31,7 @@ public class SlowEffect : BaseStatusEffect
         }
     }
 
-    public override bool MergeWith(BaseStatusEffect newEffect)
+    public override void MergeWith(BaseStatusEffect newEffect)
     {
         if (newEffect is SlowEffect newSlow)
         {
@@ -37,10 +40,10 @@ public class SlowEffect : BaseStatusEffect
             {
                 Remove(); // Remove current slow
                 this.slowPercent = newSlow.slowPercent;
-                Apply(); // Apply new slow
+                Apply(holder); // Apply new slow
             }
-            return true;
+
+            timer = 0f;
         }
-        return false;
     }
-} 
+}

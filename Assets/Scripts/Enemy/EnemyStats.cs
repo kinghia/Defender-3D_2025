@@ -8,13 +8,6 @@ public class EnemyStats : BaseStats
     public float CurrentHP => currentHp;
     public float CurrentHealthPercent => currentHp / GetMaxHp();
     public System.Action onDeath;
-    
-    Enemy enemy;
-
-    void Start()
-    {
-        enemy = GetComponent<Enemy>();
-    }
 
     public void Initialize(EnemyData emData = null)
     {
@@ -25,79 +18,83 @@ public class EnemyStats : BaseStats
 
         if (data == null)
         {
-            Debug.LogError($"Enemy Stats missing data on {gameObject.name}");
-            return;
+            Debug.LogError("Enemy Stats missing data");
         }
 
         currentHp = data.maxHp;
         currentShield = 0;
         ResetModifiers();
-
-        // Notify initial HP
-        InvokeHpChanged(currentHp, GetMaxHp());
     }
 
-    public void TakeDamage(float amount, DamageType damageType)
+
+    public void TakeDamage(float amount, DamageType damageType, bool canCrit = false, BaseStats attacker = null)
     {
-        if (data == null)
+        float finalDamage = amount;
+        bool isCritical = false;
+
+        // Apply critical hit if enabled and successful
+        if (canCrit && attacker != null)
         {
-            Debug.LogError($"Enemy Stats missing data on {gameObject.name}");
-            return;
+            // Use attacker's critical stats instead of enemy's own stats
+            if (attacker is TowerStats towerStats)
+            {
+                if (towerStats.RollForCritical())
+                {
+                    finalDamage = towerStats.CalculateCriticalDamage(amount);
+                    isCritical = true;
+                    Debug.Log($"CRITICAL HIT! Base damage: {amount}, Critical damage: {finalDamage}");
+                }
+            }
         }
 
-        if (IsDead) return;
+        finalDamage = CalculateFinalDamage(finalDamage, damageType);
 
-        float finalDamage = CalculateFinalDamage(amount, damageType);
         float remainingDamage = ProcessShieldDamage(finalDamage);
-        float healthDamage = ProcessHealthDamage(remainingDamage, damageType);
+
+        float healthDamage = ProcessHealthDamage(remainingDamage, damageType, isCritical);
 
         // Notify HP change
         InvokeHpChanged(currentHp, GetMaxHp());
-
-        // Check for death
-        if (IsDead)
-        {
-            HandleDeath();
-        }
     }
 
-    private void HandleDeath()
+    private float ProcessHealthDamage(float damage, DamageType damageType, bool isCritical = false)
     {
-        onDeath?.Invoke();
-        
-    }
-
-    private float ProcessHealthDamage(float damage, DamageType damageType)
-    {
-        if (FloatingTextSpawner.Instance == null)
-        {
-            Debug.LogWarning("FloatingTextSpawner.Instance is null");
-            currentHp = Mathf.Max(0, currentHp - damage);
-            return damage;
-        }
-
         currentHp = Mathf.Max(0, currentHp - damage);
 
-        FloatingTextType fType = FloatingTextType.Default;
+        Color color = Color.white;
+        int size = 14;
         switch (damageType)
         {
             case DamageType.Physical:
-                fType = FloatingTextType.Physic;
+                color = Color.red;
                 break;
             case DamageType.Magic:
-                fType = FloatingTextType.Magic;
+                color = new Color(111, 0, 208);
                 break;
             case DamageType.True:
-                fType = FloatingTextType.Default;
+                size = 12;
                 break;
         }
 
-        FloatingTextSpawner.Instance.SpawnText(
+        FloatingTextSpawner.Instance.SpawnDamage(
             damage.ToString("F0"),
-            transform.position,
-            fType
+            transform.position + Vector3.up * 5,
+            color,
+            size,
+            isCritical
         );
+
+        if (currentHp <= 0)
+        {
+            onDeath?.Invoke();
+        }
+
         return damage;
+    }
+    public void SelfDead()
+    {
+        currentHp = 0;
+        onDeath?.Invoke();
     }
 
     public void Heal(float amount)
@@ -148,12 +145,6 @@ public class EnemyStats : BaseStats
     public float GetHPRegen() => data.hpRegen;
     public int GetDetectRange() => data.detectRange;
 
-    // Expose HP changed event for UI
-    public new event System.Action<float, float> OnHpChanged
-    {
-        add { base.OnHpChanged += value; }
-        remove { base.OnHpChanged -= value; }
-    }
 }
 
 public enum DamageType

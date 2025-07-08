@@ -67,7 +67,7 @@ public class Arrow : MonoBehaviour
                     FloatingTextSpawner.Instance.SpawnText(
                         damage.ToString("F0"),
                         enemy.transform.position + Vector3.up,
-                        FloatingTextType.Physic
+                        Color.red
                     );
                 }
             }

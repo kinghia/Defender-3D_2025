@@ -189,18 +189,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48150f0c76aaa2c4cbedf939cc1158e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floatSpeed: 1.5
-  fadeDuration: 1
-  punchScale: 1.2
-  punchDuration: 0.15
+  lifetime: 0.3
+  speed: 1
   floatCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0

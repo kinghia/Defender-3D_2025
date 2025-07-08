@@ -18,6 +18,10 @@ public class ElectricTower : TowerBase
                 bullet.SetTarget(currentTarget.transform);
                 bullet.OnHit += HandleBulletHit;
             }
+            else
+            {
+                Debug.Log("ElectricTower must fire bullet that type ElectricBulletBehavior");
+            }
         }
     }
 
@@ -25,17 +29,19 @@ public class ElectricTower : TowerBase
     {
         if (hitTarget == null) return;
         base.HandleBulletHit(hitTarget);
-        
+
         ShowHitEffect(hitTarget);
         EnemyStats emStats = hitTarget.GetComponent<EnemyStats>();
         if (emStats != null)
         {
-            emStats.TakeDamage(stats.GetPhysicalDamage(), DamageType.Physical);
+            float damage = stats.GetPhysicalDamage();
+            emStats.TakeDamage(damage, DamageType.Physical, true, this.stats);
         }
 
-        ElectricityEffect electricityEffect = new ElectricityEffect(hitTarget.gameObject, 5, 1, 0.2f, 1f);
+        ElectricityEffect electricityEffect = new ElectricityEffect(5, 1, 0.2f, 1f);
         StatusEffectReceiver statusEffectReceiver = hitTarget.GetComponent<StatusEffectReceiver>();
-        if (statusEffectReceiver != null) {
+        if (statusEffectReceiver != null)
+        {
             statusEffectReceiver.AddEffect(electricityEffect);
         }
 

@@ -104,7 +104,7 @@ public abstract class BaseStats : MonoBehaviour, IStats
 
     // Events
     public event System.Action<float> OnShieldChanged;
-    protected event System.Action<float, float> OnHpChanged; // (currentHp, maxHp)
+    public event System.Action<float, float> OnHpChanged; // (currentHp, maxHp)
     protected void InvokeHpChanged(float current, float max) => OnHpChanged?.Invoke(current, max);
 
     // IStats implementation

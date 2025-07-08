@@ -25,7 +25,13 @@ MonoBehaviour:
       delayBetweenEnemies: 1
   - laneZ: -5
     waves:
-    - startDelay: 2
+    - startDelay: 10
       enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
       enemyCount: 20
-      delayBetweenEnemies: 0.4
+      delayBetweenEnemies: 1
+  - laneZ: 10
+    waves:
+    - startDelay: 15
+      enemyType: {fileID: 11400000, guid: ec00ab5bb984062469333e09b2190972, type: 2}
+      enemyCount: 15
+      delayBetweenEnemies: 1

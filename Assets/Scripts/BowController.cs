@@ -42,16 +42,11 @@ public class BowController : MonoBehaviour
     {
         if (isAiming)
         {
-            // Get mouse position in world space
-            Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
-            Plane plane = new Plane(Vector3.up, Vector3.zero);
-            if (plane.Raycast(ray, out float distance))
-            {
-                mousePosition = ray.GetPoint(distance);
-            }
+            // Lấy vị trí chuột trong thế giới bằng Mouse3D
+            Vector3 mouseWorldPosition = Mouse3D.GetMouseWorldPosition();
 
             // Calculate direction to mouse
-            Vector3 direction = (mousePosition - transform.position).normalized;
+            Vector3 direction = (mouseWorldPosition - transform.position).normalized;
             direction.y = 0; // Keep arrows horizontal
 
             // Check if direction is within allowed angle
@@ -74,19 +69,20 @@ public class BowController : MonoBehaviour
     {
         if (arrowPrefab == null || firePoint == null)
         {
-            Debug.LogError("Arrow prefab or fire point not assigned!");
+            Debug.LogError("Arrow prefab hoặc fire point chưa được gán!");
             return;
         }
 
-        // Calculate direction to mouse
-        Vector3 direction = (mousePosition - transform.position).normalized;
+        // Lấy vị trí chuột trong thế giới bằng Mouse3D
+        Vector3 mouseWorldPosition = Mouse3D.GetMouseWorldPosition();
+        Vector3 direction = (mouseWorldPosition - transform.position).normalized;
         direction.y = 0; // Keep arrows horizontal
 
         // Check if direction is within allowed angle
         float angle = Vector3.SignedAngle(transform.forward, direction, Vector3.up);
         if (Mathf.Abs(angle) > maxShootAngle)
         {
-            Debug.Log("Cannot shoot in that direction - angle limit exceeded");
+            Debug.Log("Không thể bắn theo hướng này - vượt quá giới hạn góc");
             return;
         }
 

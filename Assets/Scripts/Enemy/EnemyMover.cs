@@ -33,7 +33,7 @@ public class EnemyMover : MonoBehaviour
         if (enemyStats == null || castleTransform == null) return;
 
         if (isMoving)
-        {
+        {   
             // Check if in attack range
             float distanceToCastle = Mathf.Abs(transform.position.x - castleTransform.position.x);
             if (distanceToCastle <= attackRange)
@@ -48,12 +48,12 @@ public class EnemyMover : MonoBehaviour
         }
     }
 
-    public void StopMoving()
+    public void ResumeMovement()
     {
         isMoving = false;
     }
 
-    public void ResumeMoving()
+    public void PauseMovement()
     {
         isMoving = true;
     }

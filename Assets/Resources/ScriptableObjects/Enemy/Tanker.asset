@@ -31,6 +31,6 @@ MonoBehaviour:
   lifestealPercent: 0
   attackSpeed: 0.1
   moveSpeed: 4
-  range: 0
-  detectRange: 0
+  range: 1
+  detectRange: 1
   healingReceivedPercent: 100

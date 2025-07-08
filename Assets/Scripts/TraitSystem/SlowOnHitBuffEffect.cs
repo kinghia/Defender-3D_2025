@@ -10,7 +10,6 @@ public class SlowOnHitBuffEffect : TraitBuffEffect
 
     public override void ApplyBuff(TowerBase tower)
     {
-        Debug.Log($"Applying SlowOnHitBuff to tower: {tower.name}");
         // Subscribe to tower's OnHit event
         tower.OnHit += HandleTowerHit;
     }
@@ -33,7 +32,7 @@ public class SlowOnHitBuffEffect : TraitBuffEffect
         }
 
         // Create and apply slow effect
-        SlowEffect slowEffect = new SlowEffect(hitTarget.gameObject, slowDuration, slowPercent/100f);
+        SlowEffect slowEffect = new SlowEffect(slowDuration, slowPercent/100f);
         statusEffectReceiver.AddEffect(slowEffect);
     }
 } 

@@ -4,15 +4,10 @@ using TMPro;
 public class FloatingText : MonoBehaviour
 {
     [Header("Animation Settings")]
-    public float floatSpeed = 1.5f;
-    public float fadeDuration = 1.0f;
-    public float punchScale = 1.2f;
-    public float punchDuration = 0.15f;
+    public float lifetime = 1.0f;
+    public float speed = 1.0f;
     public AnimationCurve floatCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
     private TextMeshPro textMesh;
-    private Color startColor;
-    private float lifetime;
     private float elapsed;
     private Vector3 startPos;
     private Vector3 endPos;
@@ -33,32 +28,27 @@ public class FloatingText : MonoBehaviour
         if (mainCamera == null) mainCamera = Camera.main;
     }
 
-    public void Init(string content, Vector3 worldPos, Color color, float fontSize, System.Action<FloatingText> onDespawnCallback)
+    public void Init(string content, Vector3 worldPos, Color color, float fontSize, System.Action<FloatingText> onDespawnCallback, float duration = 0f)
     {
         transform.position = worldPos;
         startPos = worldPos;
-        endPos = worldPos + Vector3.up * 1.5f;
+        endPos = worldPos + Vector3.up * speed;
         textMesh.text = content;
         textMesh.color = color;
         textMesh.fontSize = fontSize;
-        startColor = color;
-        lifetime = fadeDuration;
         onDespawn = onDespawnCallback;
-        // Punch scale animation
-        transform.localScale = Vector3.one * punchScale;
+        if (duration > 0) {
+            lifetime = duration;
+        }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!isActive) return;
-        elapsed += Time.deltaTime;
+        elapsed += Time.fixedDeltaTime;
         float t = Mathf.Clamp01(elapsed / lifetime);
         // Move up
         transform.position = Vector3.Lerp(startPos, endPos, floatCurve.Evaluate(t));
-        // Fade out
-        var c = textMesh.color;
-        c.a = Mathf.Lerp(startColor.a, 0, t);
-        textMesh.color = c;
         // Billboard
         if (mainCamera)
             transform.forward = mainCamera.transform.forward;
@@ -69,4 +59,4 @@ public class FloatingText : MonoBehaviour
             onDespawn?.Invoke(this);
         }
     }
-} 
+}

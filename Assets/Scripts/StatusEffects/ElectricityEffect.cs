@@ -12,7 +12,7 @@ public class ElectricityEffect : BaseStatusEffect
     private float damageTickTimer; // Timer for applying damage per second
     private const float DAMAGE_TICK_INTERVAL = 0.5f; // Apply damage every 1 second
 
-    public ElectricityEffect(GameObject holder, float duration, float damagePerStackPerSecond, float stunChance, float stunDuration) : base(holder, duration)
+    public ElectricityEffect(float duration, float damagePerStackPerSecond, float stunChance, float stunDuration) : base(duration)
     {
         this.currentStacks = 1; // Start with 1 stack when applied initially
         this.damagePerStackPerSecond = damagePerStackPerSecond;
@@ -22,8 +22,9 @@ public class ElectricityEffect : BaseStatusEffect
         this.damageTickTimer = 0f;
     }
 
-    public override void Apply()
+    public override void Apply(GameObject holder)
     {
+        base.Apply(holder);
         CheckForMaxStacks(); // Check immediately on apply in case 10 stacks are applied at once
     }
 
@@ -52,9 +53,11 @@ public class ElectricityEffect : BaseStatusEffect
 
     public override void Remove()
     {
+        if (isRemoved) return;
+        base.Remove();
     }
 
-    public override bool MergeWith(BaseStatusEffect newEffect)
+    public override void MergeWith(BaseStatusEffect newEffect)
     {
         if (newEffect is ElectricityEffect)
         {
@@ -65,17 +68,17 @@ public class ElectricityEffect : BaseStatusEffect
             timer = 0f;
 
             CheckForMaxStacks();
-
-            return true; // Indicate successful merge
         }
-        return false; // Indicate cannot merge with this type of effect
     }
 
     private void CheckForMaxStacks()
     {
         if (currentStacks >= MAX_STACKS)
         {
-
+            if (holder.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                enemy.GetComponent<EnemyStats>().TakeDamage(99f, DamageType.True);
+            }
             // Stun chance
             if (UnityEngine.Random.value < stunChance)
             {
@@ -84,7 +87,7 @@ public class ElectricityEffect : BaseStatusEffect
                 if (receiver != null)
                 {
                     // Create and add the StunEffect
-                    StunEffect stun = new StunEffect(holder, stunDuration);
+                    StunEffect stun = new StunEffect(stunDuration);
                     receiver.AddEffect(stun); // Add effect via receiver to handle its lifecycle
                 }
             }
